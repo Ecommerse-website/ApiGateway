@@ -1,14 +1,59 @@
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#      - id: USER-SERVICE
+#        uri: lb://USER-SERVICE
+#        predicates:
+#        - Path=/users/**
+#        - Path=/auth/**
 spring:
+  application:
+    name: Api-Gateway
+ 
   cloud:
     gateway:
       routes:
-      - id: USER-SERVICE
-        uri: lb://USER-SERVICE
-        predicates:
-        - Path=/users/**
-
-      -id: SECURITY-SERVICE
-      uri: lb://SECURITY-SERVICE
-      predicates:
-       - Path=/auth/**
-
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/auth/**,/users/**
+          filters:
+            - AuthenticationFilter # Reference your custom authentication filter
+ 
+        - id: PROJECT-SERVICE
+          uri: lb://PROJECT-SERVICE
+          predicates:
+            - Path=/project/**
+          filters:
+            - AuthenticationFilter # Reference your custom authentication filter
+ 
+ 
+        - id: TASK-SERVICE
+          uri: lb://TASK-SERVICE
+          predicates:
+            - Path=/task/**
+          filters:
+            - AuthenticationFilter # Reference your custom authentication filter
+ 
+        - id: Task-Security
+          uri: lb://Task-Security
+          predicates:
+            - Path=/auth/**
+ 
+        - id: COMMENT-SERVICE
+          uri: lb://COMMENT-SERVICE
+          predicates:
+            - Path=/comment/**
+          filters:
+            - AuthenticationFilter # Reference your custom authentication filter
+ 
+server:
+  port: 8080
+ 
+eureka:
+  instance:
+    client:
+      serverUrl:
+        defaultZone: http://localhost:8761/eureka/
+ 
